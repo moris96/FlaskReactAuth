@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, session 
 from flask.json import jsonify
 from flask_bcrypt import Bcrypt
 from config import ApplicationConfig
@@ -13,23 +13,26 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-@app.route("/register")
-def registerUser():
-    email = request.jsion["email"]
+@app.route("/register", methods=["POST"])
+def register_user():
+    email = request.json["email"]
     password = request.json["password"]
 
-    userExists = User.query.filter_by(email=email).first() is not None 
+    user_exists = User.query.filter_by(email=email).first() is not None
 
-    if userExists:
-        abort(409)
-    hashedPassword = bcrypt.generate_password_hash(password)
-    newUser = User(email=email)
-    db.session.add(newUser)
+    if user_exists:
+        return jsonify({"error": "User already exists"}), 409
+
+    hashed_password = bcrypt.generate_password_hash(password)
+    new_user = User(email=email, password=hashed_password)
+    db.session.add(new_user)
     db.session.commit()
+    
+    session["user_id"] = new_user.id
 
     return jsonify({
-        "id": newUser.id,
-        "email": newUser.email
+        "id": new_user.id,
+        "email": new_user.email
     })
 
 
