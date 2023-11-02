@@ -1,7 +1,12 @@
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
+
 class ApplicationConfig:
-    #stops logging useless messages
-    SQLALCHEMY_TRACK_MODIFICATIONS = False 
-    #whats happening with database
+    SECRET_KEY = os.environ["SECRET_KEY"]
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
-    #using sqlite database 
     SQLALCHEMY_DATABASE_URI = r"sqlite:///./db.sqlite"
