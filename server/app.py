@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, session
 # from flask.json import jsonify
+from flask_cors import CORS
 from flask_session import Session
 from flask_bcrypt import Bcrypt
 from config import ApplicationConfig
@@ -9,11 +10,13 @@ app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
 
 bcrypt = Bcrypt(app)
+cors = CORS(app, support_credentials=True)
 server_session = Session(app)
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
 
 @app.route("/@me")
 def get_current_user():
